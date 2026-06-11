@@ -1,0 +1,76 @@
+.login-container {
+  background-color: #1a1d23;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.logo {
+  width: 120px;
+  margin-bottom: 10px;
+}
+
+.title {
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 400px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #22c55e;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+}
+
+
+
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #152826;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  border-color: #22c55e;
+  border-inline: 3px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn:hover {
+  background-color: #16a34a;
+}
+
+.btn-google:hover {
+  background-color: #1f3a37;
+}
+.btn-icon {
+  width: 22px;
+  height: 22px;
+}

@@ -1,0 +1,147 @@
+.explore-page {
+  padding: 24px;
+}
+
+.explore-cards-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.explore-card {
+  background-color: #1e212a;
+  border-radius: 10px;
+  padding: 16px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.explore-card-badge {
+  font-size: 11px;
+  color: #8c8d8f;
+}
+
+.explore-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+.explore-card-university {
+  font-size: 11px;
+  color: #8c8d8f;
+  margin: 0 0 8px 0;
+}
+
+.explore-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.btn-request {
+  background-color: #00b764;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn-request:hover {
+  background-color: #009952;
+}
+
+.btn-preview {
+  background-color: #2a2d35;
+  color: #8c8d8f;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn-preview:hover {
+  background-color: #33373f;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal-box {
+  background: #1e212a;
+  border-radius: 12px;
+  padding: 24px;
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #8c8d8f;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #ffffff;
+}
+
+.modal-title {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.modal-desc {
+  color: #8c8d8f;
+  font-size: 12px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.modal-email-input {
+  background-color: #2a2d35;
+  border: 1px solid #3a3d45;
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: #ffffff;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-email-input::placeholder {
+  color: #8c8d8f;
+}
+
+.modal-email-input:focus {
+  border-color: #00b764;
+}

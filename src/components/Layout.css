@@ -1,0 +1,179 @@
+.side-bar {
+  width: 295px;
+  display: flex;
+  border-right: 1px solid #2a2d35;
+  flex-direction: column;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+}
+
+.logo-icon{
+  padding: 0 32px;
+  margin: 15px;
+  margin-bottom: 0px;
+}
+
+.logoIconImg{
+  width: 125px;
+  height: 50px;
+}
+
+.nav-item {
+  color: #ffffff;
+  text-decoration: none;
+  padding: 32px 56px;
+  border-bottom: 1px solid #8C8D8F;
+}
+
+.nav-item:hover {
+  background-color: #152826;
+}
+
+.nav-item.active {
+  background-color: #1f3a37;
+  color: #ffffff;
+  border-bottom: 1px solid #8C8D8F;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-icon {
+  width: 20px;
+}
+
+.layout {
+  display: flex;
+  height: 100vh;
+  background-color: #1a1d23;
+}
+
+.layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.layout-body {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #1a1d23;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 16px;
+}
+
+.research {
+  background-color: #1E212A;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.researchBox {
+  color: #ffffff;
+  text-align: center;
+  font-size: 13px;
+}
+
+.researchbtn {
+  background-color: #00B764;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  width: 100%;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.researchbtn:hover {
+  background-color: #009952;
+}
+
+
+.header {
+  height: 60px;
+  border-bottom: 1px solid #2a2d35;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  justify-content: space-between;
+}
+
+.header-title {
+  color: #8C8D8F;
+  font-size: 24px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.search-bar {
+  gap: 20px;
+  display: flex;
+  align-items: center;
+  background-color: #2a2d35;
+  border-radius: 8px;  padding: 8px 14px;
+  width: 410px;
+  justify-content: center;
+}
+
+.search-input {
+  background: none;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 14px;
+  width: 100%;
+}
+
+.search-input::placeholder {
+  color: #8C8D8F;
+}
+
+.username-frame{
+    display: flex;
+    align-items: center;
+    gap: 44px;
+}
+
+.username{
+    display: flex;
+    align-items: center;
+    color: #8C8D8F;
+    gap: 15px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+/* TEMP dev tool — dashed pill to flip role. Remove with the toggle later. */
+.dev-role-toggle {
+    background-color: transparent;
+    color: #22c55e;
+    border: 1px dashed #22c55e;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.dev-role-toggle:hover {
+    background-color: #152826;
+}

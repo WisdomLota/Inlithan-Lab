@@ -1,0 +1,101 @@
+import './Dashboard.css'
+
+import emptyIcon from '../assets/emptyIcon.png'
+import panelIcon from '../assets/courses.png'
+
+import CourseCard from '../components/CourseCard'
+import ActivityCard from '../components/ActivityCard'
+import NewStudentPopup from '../components/NewStudentPopup'
+import CreateCoursePopup from '../components/CreateCoursePopup'
+
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useCourses } from '../context/useCourses'
+import { useActivities } from '../context/useActivities'
+
+function TeacherDashboard() {
+  const { courses } = useCourses()
+  const { activities } = useActivities()
+  const [showNewStudents, setShowNewStudents] = useState(false)
+  const [showCreateCourse, setShowCreateCourse] = useState(false)
+  const navigate = useNavigate()
+
+  if (courses.length === 0) {
+    return (
+      <div className='main'>
+        <div className='body'>
+          <div className='empty-state'>
+            <img src={emptyIcon} alt="empty" />
+            <p>Your Courses and Activities will appear here once you create a course</p>
+            <button className='btn-join' onClick={() => setShowCreateCourse(true)}>
+              <img src={panelIcon} alt="" className='btn-inline-icon' />
+              Create Course
+            </button>
+          </div>
+          {showCreateCourse && (
+            <CreateCoursePopup
+              onClose={() => setShowCreateCourse(false)}
+              onCreate={() => navigate('/courses')}
+            />
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className='main'>
+      <div className='body'>
+        <div className='teacher-panel-wrap'>
+          <div className='teacher-panel'>
+            <span className='teacher-panel-title'>New Student Requests</span>
+            <button className='teacher-panel-btn' onClick={() => setShowNewStudents(!showNewStudents)}>
+              <img src={panelIcon} alt="" className='btn-inline-icon' />
+              View Student List
+            </button>
+          </div>
+          {showNewStudents && <NewStudentPopup onClose={() => setShowNewStudents(false)} />}
+        </div>
+
+        <div className='teacher-panel'>
+          <span className='teacher-panel-title'>Student List</span>
+          <button className='teacher-panel-btn' onClick={() => navigate('/students')}>
+            <img src={panelIcon} alt="" className='btn-inline-icon' />
+            View Student List
+          </button>
+        </div>
+
+        <h2 className='section-title'>Courses</h2>
+        <div className='cards-row'>
+          {courses.map((course) => (
+            <CourseCard
+              key={course.id}
+              id={course.id}
+              title={course.title}
+              icon={course.icon}
+              code={course.code}
+              students={course.students}
+            />
+          ))}
+        </div>
+
+        <h2 className='section-title'>Activities</h2>
+        <div className='cards-row'>
+          {activities.map((activity) => (
+            <ActivityCard
+              key={activity.id}
+              type={activity.type}
+              title={activity.title}
+              total={activity.total}
+              questions={activity.questions}
+              submissions={activity.submissions}
+              onClick={() => navigate(`/courses/${activity.courseId}/activity/${activity.id}`)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default TeacherDashboard

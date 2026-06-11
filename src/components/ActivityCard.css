@@ -1,0 +1,33 @@
+.activity-card {
+  background-color: #1e2128;
+  border-radius: 10px;
+  padding: 16px;
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.activity-card:hover {
+  background-color: #2a2d35;
+}
+
+.activity-type {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.activity-title {
+  color: #8C8D8F;
+  font-size: 13px;
+}
+
+.activity-footer {
+  display: flex;
+  justify-content: space-between;
+  color: #8C8D8F;
+  font-size: 12px;
+  margin-top: 4px;
+}

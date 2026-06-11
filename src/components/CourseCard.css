@@ -1,0 +1,30 @@
+.course-card {
+  background-color: #1e2128;
+  border-radius: 10px;
+  padding: 16px;
+  width: 160px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.course-card:hover {
+  background-color: #2a2d35;
+}
+
+.card-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.card-title {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.card-questions {
+  color: #8C8D8F;
+  font-size: 12px;
+}
