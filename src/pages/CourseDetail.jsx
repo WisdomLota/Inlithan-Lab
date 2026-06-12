@@ -32,6 +32,7 @@ function CourseDetail() {
       }
     } catch (err) {
       console.error('Upload failed:', err)
+      alert(err.response?.data?.error || 'PDF processing failed. Try a shorter document.')
     } finally {
       setUploading(false)
     }
@@ -87,6 +88,7 @@ function CourseDetail() {
       setWeekFlags(prev => ({ ...prev, [week._id]: res.data }))
     } catch (err) {
       console.error('Recheck failed:', err)
+      setWeekFlags(prev => ({ ...prev, [week._id]: { error: err.response?.data?.error || 'AI service unavailable. Please try again later.' } }))
     } finally {
       setCheckingWeek(null)
     }
@@ -225,14 +227,18 @@ function CourseDetail() {
                   )}
 
                   {weekFlags[week._id] && (
-                    <div style={{ marginTop: 12, padding: 12, border: '1px dashed', borderColor: weekFlags[week._id].isUpToDate ? '#00B764' : '#e05555', borderRadius: 6, color: weekFlags[week._id].isUpToDate ? '#00B764' : '#e05555', fontSize: 13 }}>
-                      {weekFlags[week._id].isUpToDate ? (
+                    <div style={{ marginTop: 12, padding: 12, border: '1px dashed', borderColor: weekFlags[week._id].error ? '#e05555' : (weekFlags[week._id].isUpToDate ? '#00B764' : '#e05555'), borderRadius: 6, color: weekFlags[week._id].error ? '#e05555' : (weekFlags[week._id].isUpToDate ? '#00B764' : '#e05555'), fontSize: 13 }}>
+                      {weekFlags[week._id].error ? (
+                        <strong>⚠ {weekFlags[week._id].error}</strong>
+                      ) : weekFlags[week._id].isUpToDate ? (
                         <strong>✓ Content appears up to date.</strong>
                       ) : (
                         <>
                           <strong>AI flagged outdated content:</strong>
                           <ul>
-                            {(weekFlags[week._id].outdatedFlags || []).map((flag, i) => <li key={i}>{flag}</li>)}
+                            {(weekFlags[week._id].outdatedFlags || []).map((flag, i) => (
+                              <li key={i}>{typeof flag === 'string' ? flag : (flag.text || JSON.stringify(flag))}</li>
+                            ))}
                           </ul>
                         </>
                       )}
