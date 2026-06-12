@@ -11,7 +11,8 @@ function AuthCallback() {
     const token = params.get('token')
     if (token) {
       localStorage.setItem('token', token)
-      const payload = JSON.parse(atob(token.split('.')[1]))
+      const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+      const payload = JSON.parse(atob(base64))
       setUser(payload)
       // if role was already set on a previous login, skip role picker
       if (payload.role && payload.role !== 'unset') {

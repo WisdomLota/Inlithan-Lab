@@ -6,7 +6,8 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('token')
     if (!token) return null
     try {
-      return JSON.parse(atob(token.split('.')[1]))
+      const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+      return JSON.parse(atob(base64))
     } catch {
       return null
     }
