@@ -1,18 +1,31 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ActivitiesContext } from './ActivitiesContext'
+import { useAuth } from './useAuth'
+import { getActivities } from '../api/activities'
 
 export function ActivitiesProvider({ children }) {
-  const [activities, setActivities] = useState([
+  const { user } = useAuth()
+  const [activities, setActivities] = useState([])
+  const [loading, setLoading] = useState(true)
 
-    { id: 1, courseId: 1, type: "Quiz", title: "Economics for Engineers", total: 426, questions: 15, minutes: 30, submissions: "25/64" },
-    { id: 2, courseId: 1, type: "Notes", title: "Economics for Engineers", total: 426, questions: 15, submissions: "25/64" },
-    { id: 3, courseId: 1, type: "Assignment", title: "Economics for Engineers", total: 426, questions: 15, submissions: "25/64" },
-    { id: 4, courseId: 1, type: "Quiz", title: "Economics for Engineers", total: 426, questions: 15, minutes: 30, submissions: "25/64" },
+  async function refreshActivities() {
+    if (!user) return
+    try {
+      const res = await getActivities()
+      const mapped = (res.data || []).map(a => ({ ...a, id: a._id, courseId: a.courseId }))
+      setActivities(mapped)
+    } catch (err) {
+      console.error("Failed to load activities:", err)
+    }
+  }
 
-  ])
+  useEffect(() => {
+    setLoading(true)
+    refreshActivities().finally(() => setLoading(false))
+  }, [user])
 
   return (
-    <ActivitiesContext.Provider value={{ activities, setActivities }}>
+    <ActivitiesContext.Provider value={{ activities, setActivities, loading, refreshActivities }}>
       {children}
     </ActivitiesContext.Provider>
   )
