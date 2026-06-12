@@ -9,6 +9,7 @@ import ActivityCard from '../components/ActivityCard'
 import { useCourses } from '../context/useCourses'
 import { useActivities } from '../context/useActivities'
 import { useAuth } from '../context/useAuth'
+import { useNavigate } from 'react-router-dom'
 import TeacherDashboard from './TeacherDashboard'
 
 
@@ -18,6 +19,7 @@ function Dashboard() {
     const { courses } = useCourses()
     const { activities } = useActivities([])
     const { user } = useAuth()
+    const navigate = useNavigate()
 
     if (user?.role === 'teacher') return <TeacherDashboard />
 
@@ -59,7 +61,7 @@ function Dashboard() {
                                 total={activity.total}
                                 questions={activity.questions}
                                 questionCount={activity.questionCount}
-                                onClick={isTeacher ? () => navigate(`/courses/${activity.courseId?._id || activity.courseId}/activity/${activity.id}`) : undefined}
+                                onClick={() => navigate(`/courses/${activity.courseId?._id || activity.courseId}/activity/${activity.id}`)}
                                 />
                             ))}
                         </div>

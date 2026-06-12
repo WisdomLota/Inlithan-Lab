@@ -1,19 +1,42 @@
 import { useState } from 'react'
 import { useCourses } from '../context/useCourses.js'
 import './Explore.css'
+import { joinCourse } from '../api/courses'
 
 function Explore() {
-  const { exploreCourses } = useCourses()
+  const { exploreCourses, refreshCourses, refreshExplore, loading } = useCourses()
   const [modalCourse, setModalCourse] = useState(null)
   const [email, setEmail] = useState('')
+  const [joining, setJoining] = useState(false)
 
   function openModal(course) {
     setModalCourse(course)
     setEmail('')
   }
 
+  async function handleJoin() {
+    if (!modalCourse) return
+    setJoining(true)
+    try {
+      await joinCourse(modalCourse.id)
+      await refreshCourses()
+      await refreshExplore()
+      setModalCourse(null)
+    } catch (err) {
+      console.error('Failed to join course:', err)
+    } finally {
+      setJoining(false)
+    }
+  }
+
   return (
     <div className="explore-page">
+
+      {loading && <p style={{ color: '#8c8d8f', padding: 16 }}>Loading courses...</p>}
+      {!loading && exploreCourses.length === 0 && (
+        <p style={{ color: '#8c8d8f', padding: 16 }}>No courses available to join right now.</p>
+      )}
+      
       <div className="explore-cards-grid">
         {exploreCourses.map(course => (
           <div key={course.id} className="explore-card">
@@ -49,8 +72,8 @@ function Explore() {
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
-            <button className="btn-request">
-              Request to Join
+            <button className="btn-request" onClick={handleJoin} disabled={joining}>
+              {joining ? 'Joining...' : 'Request to Join'}
             </button>
           </div>
         </div>

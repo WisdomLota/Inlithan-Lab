@@ -97,7 +97,7 @@ function CourseDetail() {
           <div
             key={activity.id}
             className="activity-card"
-            onClick={isTeacher ? () => navigate(`/courses/${courseId}/activity/${activity.id}`) : undefined}
+            onClick={() => navigate(`/courses/${courseId}/activity/${activity.id}`)}
           >
             <div className="activity-type">{activity.type}</div>
             <div className="activity-course-name">{activity.title}</div>
