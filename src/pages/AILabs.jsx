@@ -1,31 +1,84 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/useAuth'
+import { getSessions, getSession, createSession, deleteSession, sendMessage } from '../api/labs'
 import './AILabs.css'
-
-const MOCK_SESSIONS = [
-  { id: 1, title: 'Programing II', date: '12 April 2025' },
-  { id: 2, title: 'Asset Pricing model and structures', date: '12 March 2025' },
-  { id: 3, title: 'Operations research', date: '12 September 2025' },
-  { id: 4, title: 'Economics for Engineers', date: '12 May 2025' },
-]
 
 function AILabs() {
   const { user } = useAuth()
   const [view, setView] = useState('history')
   const [mode, setMode] = useState('buddy')
+  const [sessions, setSessions] = useState([])
+  const [currentSession, setCurrentSession] = useState(null)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [loadingSessions, setLoadingSessions] = useState(true)
 
-  function openChat() {
-    setMessages([])
-    setView('chat')
+  async function loadSessions() {
+    try {
+      const res = await getSessions()
+      setSessions(res.data || [])
+    } catch (err) {
+      console.error('Failed to load sessions:', err)
+    } finally {
+      setLoadingSessions(false)
+    }
   }
 
-  function sendMessage() {
+  useEffect(() => { loadSessions() }, [])
+
+  async function openSession(id) {
+    try {
+      const res = await getSession(id)
+      setCurrentSession(res.data)
+      setMessages(res.data.messages || [])
+      setMode(res.data.mode)
+      setView('chat')
+    } catch (err) {
+      console.error('Failed to open session:', err)
+    }
+  }
+
+  async function openChat() {
+    try {
+      const res = await createSession(mode)
+      setCurrentSession(res.data)
+      setMessages([])
+      setView('chat')
+      await loadSessions()
+    } catch (err) {
+      console.error('Failed to create session:', err)
+    }
+  }
+
+  async function handleDelete(id, e) {
+    e.stopPropagation()
+    try {
+      await deleteSession(id)
+      await loadSessions()
+    } catch (err) {
+      console.error('Failed to delete session:', err)
+    }
+  }
+
+  async function handleSend() {
     const text = input.trim()
-    if (!text) return
-    setMessages(prev => [...prev, { id: Date.now(), role: 'user', text }])
+    if (!text || !currentSession) return
+
+    setMessages(prev => [...prev, { role: 'user', text }])
     setInput('')
+    setLoading(true)
+
+    try {
+      const res = await sendMessage(currentSession._id, text)
+      setMessages(res.data.messages)
+      await loadSessions()
+    } catch (err) {
+      console.error('Send failed:', err)
+      setMessages(prev => [...prev, { role: 'ai', text: 'Sorry, something went wrong.' }])
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (view === 'history') {
@@ -39,14 +92,20 @@ function AILabs() {
         </div>
 
         <div className="lab-session-list">
-          {MOCK_SESSIONS.map(session => (
-            <div key={session.id} className="lab-session-item" onClick={openChat}>
-              <div className="lab-session-icon" />
-              <span className="lab-session-name">{session.title}</span>
-              <span className="lab-session-date">{session.date}</span>
-              <button className="lab-session-menu" onClick={e => e.stopPropagation()}>···</button>
-            </div>
-          ))}
+          {loadingSessions ? (
+            <p style={{ color: '#8c8d8f', padding: 12 }}>Loading...</p>
+          ) : sessions.length === 0 ? (
+            <p style={{ color: '#8c8d8f', padding: 12 }}>No sessions yet. Start one above.</p>
+          ) : (
+            sessions.map(session => (
+              <div key={session._id} className="lab-session-item" onClick={() => openSession(session._id)}>
+                <div className="lab-session-icon" />
+                <span className="lab-session-name">{session.title}</span>
+                <span className="lab-session-date">{new Date(session.updatedAt).toLocaleDateString()}</span>
+                <button className="lab-session-menu" onClick={(e) => handleDelete(session._id, e)}>✕</button>
+              </div>
+            ))
+          )}
         </div>
       </div>
     )
@@ -54,7 +113,7 @@ function AILabs() {
 
   return (
     <div className="lab-chat-page">
-      <div className="lab-chat-back" onClick={() => setView('history')}>
+      <div className="lab-chat-back" onClick={() => { setView('history'); loadSessions() }}>
         ‹ AI Lab
       </div>
 
@@ -84,11 +143,14 @@ function AILabs() {
           </div>
         ) : (
           <div className="lab-messages">
-            {messages.map(msg => (
-              <div key={msg.id} className={`lab-message lab-message-${msg.role}`}>
+            {messages.map((msg, i) => (
+              <div key={i} className={`lab-message lab-message-${msg.role}`}>
                 {msg.text}
               </div>
             ))}
+            {loading && (
+              <div className="lab-message lab-message-ai">Thinking...</div>
+            )}
           </div>
         )}
       </div>
@@ -99,11 +161,13 @@ function AILabs() {
           placeholder="Ask whatever you are ready.."
           value={input}
           onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && sendMessage()}
+          onKeyDown={e => e.key === 'Enter' && handleSend()}
         />
         <div className="lab-chat-input-actions">
           <button className="lab-attach-btn">+ Attach</button>
-          <button className="lab-send-btn" onClick={sendMessage}>↑</button>
+          <button className="lab-send-btn" onClick={handleSend} disabled={loading}>
+            {loading ? '...' : '↑'}
+          </button>
         </div>
       </div>
     </div>
