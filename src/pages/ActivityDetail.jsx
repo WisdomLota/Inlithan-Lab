@@ -38,7 +38,7 @@ function ActivityDetail() {
           <img src={emptyIcon} alt="" className="ad-logo" />
           <h2 className="ad-title">{activity.type} Preview</h2>
           <p className="ad-meta">
-            {activity.questions} questions
+            {activity.questionCount ?? (Array.isArray(activity.questions) ? activity.questions.length : activity.questions)} questions
             {activity.minutes && <><br />{activity.minutes} minutes</>}
           </p>
           <button className="ad-btn-solid">View Submissions</button>

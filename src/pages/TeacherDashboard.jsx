@@ -83,13 +83,13 @@ function TeacherDashboard() {
         <div className='cards-row'>
           {activities.map((activity) => (
             <ActivityCard
-              key={activity.id}
-              type={activity.type}
-              title={activity.title}
-              total={activity.total}
-              questions={activity.questions}
-              submissions={activity.submissions}
-              onClick={() => navigate(`/courses/${activity.courseId}/activity/${activity.id}`)}
+            key={activity.id}
+            type={activity.type}
+            title={activity.title}
+            total={activity.total}
+            questions={activity.questions}
+            questionCount={activity.questionCount}
+            onClick={() => navigate(`/courses/${activity.courseId?._id || activity.courseId}/activity/${activity.id}`)}
             />
           ))}
         </div>

@@ -58,6 +58,8 @@ function Dashboard() {
                                 title={activity.title}
                                 total={activity.total}
                                 questions={activity.questions}
+                                questionCount={activity.questionCount}
+                                onClick={isTeacher ? () => navigate(`/courses/${activity.courseId?._id || activity.courseId}/activity/${activity.id}`) : undefined}
                                 />
                             ))}
                         </div>

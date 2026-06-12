@@ -13,6 +13,11 @@ function Header({title, showUser}){
     // TEMP dev tool: flip role while there's no real login/backend. Remove later.
     const toggleRole = () => setRole(user?.role === 'teacher' ? 'student' : 'teacher')
 
+    const handleLogout = () => {
+      localStorage.removeItem('token')
+      window.location.href = '/'
+    }
+
 
 return (
 
@@ -44,7 +49,12 @@ return (
 
                     <img src={arrowdown} alt="arrow down" />
                 </div>
+
+                <button className='dev-role-toggle' onClick={handleLogout}>
+                  Logout
+                </button>
             </div>
+            
         )}
     </div>
 

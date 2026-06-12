@@ -13,7 +13,12 @@ function AuthCallback() {
       localStorage.setItem('token', token)
       const payload = JSON.parse(atob(token.split('.')[1]))
       setUser(payload)
-      navigate('/role')
+      // if role was already set on a previous login, skip role picker
+      if (payload.role && payload.role !== 'unset') {
+        navigate('/dashboard')
+      } else {
+        navigate('/role')
+      }
     } else {
       navigate('/')
     }
