@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useEffect } from 'react'
 import githubLogo from '../../assets/githubLogo.png'
 import googleLogo from '../../assets/googleLogo.png'
 
@@ -8,7 +9,7 @@ const INTEGRATIONS = [
     name: 'Google',
     desc: 'Sync with Google Calendar and Google Drive',
     icon: <img src={googleLogo} alt="google logo" />,
-    connected: true,
+    connected: false,
   },
   {
     id: 'github',
@@ -34,7 +35,34 @@ const INTEGRATIONS = [
 export default function IntegrationsTab() {
   const [integrations, setIntegrations] = useState(INTEGRATIONS)
 
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!token) return
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    const payload = JSON.parse(atob(base64))
+    setIntegrations(prev => prev.map(item => {
+      if (item.id === 'github') return { ...item, connected: !!payload.githubUsername }
+      if (item.id === 'google') return { ...item, connected: !!payload.hasGoogle }
+      return item
+    }))
+  
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('linked') === 'success') {
+      const newToken = params.get('token')
+      if (newToken) localStorage.setItem('token', newToken)
+      window.location.href = '/settings'
+    }
+  }, [])
+
   function toggleConnect(id) {
+    if (id === 'github') {
+      const token = localStorage.getItem('token')
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      if (!payload.githubUsername) {
+        window.location.href = `http://localhost:5000/auth/github/link?token=${token}`
+        return
+      }
+    }
     setIntegrations(prev =>
       prev.map(item =>
         item.id === id ? { ...item, connected: !item.connected } : item
