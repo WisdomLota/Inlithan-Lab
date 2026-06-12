@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react'
-
 import activityIcon from '../assets/activities.png'
 import { useCourses } from '../context/useCourses'
+import { useActivities } from '../context/useActivities'
+import { createActivity } from '../api/activities'
 
 function RadioGroup({ name, options, value, onChange }) {
   return (
@@ -27,18 +28,42 @@ function RadioGroup({ name, options, value, onChange }) {
 
 function CreateActivityPopup({ onClose, onCreate }) {
   const { courses } = useCourses()
+  const { refreshActivities } = useActivities()
   const fileInputRef = useRef(null)
 
-  const [course, setCourse] = useState(courses[0]?.title ?? '')
+  const [course, setCourse] = useState(courses[0]?.id ?? '')
+  const [title, setTitle] = useState('')
   const [activityType, setActivityType] = useState('Assignment')
   const [questionCount, setQuestionCount] = useState('')
   const [timeBased, setTimeBased] = useState('No')
+  const [minutes, setMinutes] = useState('')
   const [questionType, setQuestionType] = useState('Theory')
   const [usePdf, setUsePdf] = useState('No')
   const [pdfFile, setPdfFile] = useState(null)
+  const [topicPrompt, setTopicPrompt] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const submit = () => {
-    onCreate({ course, activityType, questionCount, timeBased, questionType, usePdf, pdfFile })
+  const submit = async () => {
+    if (!course || !title.trim()) return
+    setLoading(true)
+    try {
+      await createActivity({
+        courseId: course,
+        title,
+        type: activityType,
+        questionCount: Number(questionCount) || 0,
+        timeBased,
+        minutes: Number(minutes) || undefined,
+        questionType,
+        topicPrompt: topicPrompt || title,
+      })
+      await refreshActivities()
+      onCreate()
+    } catch (err) {
+      console.error('Failed to create activity:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -57,9 +82,18 @@ function CreateActivityPopup({ onClose, onCreate }) {
         >
           {courses.length === 0 && <option value=''>No courses yet</option>}
           {courses.map((c) => (
-            <option key={c.id} value={c.title}>{c.title}</option>
+            <option key={c.id} value={c.id}>{c.title}</option>
           ))}
         </select>
+
+        <span className='activity-field-label'>Title:</span>
+        <input
+          type='text'
+          className='create-course-input'
+          placeholder='Activity Title'
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
         <span className='activity-field-label'>Activity Type:</span>
         <RadioGroup
@@ -67,6 +101,15 @@ function CreateActivityPopup({ onClose, onCreate }) {
           options={['Quiz', 'Assignment']}
           value={activityType}
           onChange={setActivityType}
+        />
+
+        <span className='activity-field-label'>Topic / Prompt for AI:</span>
+        <input
+          type='text'
+          className='create-course-input'
+          placeholder="e.g. Newton's laws of motion"
+          value={topicPrompt}
+          onChange={(e) => setTopicPrompt(e.target.value)}
         />
 
         <span className='activity-field-label'>Number of Questions:</span>
@@ -85,6 +128,16 @@ function CreateActivityPopup({ onClose, onCreate }) {
           value={timeBased}
           onChange={setTimeBased}
         />
+
+        {timeBased === 'Yes' && (
+          <input
+            type='number'
+            className='create-course-input'
+            placeholder='Minutes'
+            value={minutes}
+            onChange={(e) => setMinutes(e.target.value)}
+          />
+        )}
 
         <span className='activity-field-label'>Question Type:</span>
         <RadioGroup
@@ -116,9 +169,9 @@ function CreateActivityPopup({ onClose, onCreate }) {
           onChange={(e) => setPdfFile(e.target.files[0] ?? null)}
         />
 
-        <button className='btn-join create-course-submit' onClick={submit}>
+        <button className='btn-join create-course-submit' onClick={submit} disabled={loading}>
           <img src={activityIcon} alt="" className='btn-inline-icon' />
-          Create Activity
+          {loading ? 'Creating...' : 'Create Activity'}
         </button>
       </div>
     </div>

@@ -1,9 +1,27 @@
 import { useState } from 'react'
-
 import panelIcon from '../assets/courses.png'
+import { createCourse } from '../api/courses'
+import { useCourses } from '../context/useCourses'
 
 function CreateCoursePopup({ onClose, onCreate }) {
-  const [email, setEmail] = useState('')
+  const [title, setTitle] = useState('')
+  const [about, setAbout] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { refreshCourses } = useCourses()
+
+  const handleCreate = async () => {
+    if (!title.trim()) return
+    setLoading(true)
+    try {
+      await createCourse({ title, about, code: 'All 0', aboutPoints: [], aboutClosing: '' })
+      await refreshCourses()
+      onCreate()
+    } catch (err) {
+      console.error('Failed to create course:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className='popup-overlay' onClick={onClose}>
@@ -14,22 +32,28 @@ function CreateCoursePopup({ onClose, onCreate }) {
         </div>
 
         <p className='create-course-popup-text'>
-          In order for you to create a course we need either the email from the
-          school you are affiliated with or the professional email you would like
-          to use
+          Enter the title and description for your new course.
         </p>
 
         <input
-          type='email'
+          type='text'
           className='create-course-input'
-          placeholder='Work Email'
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          placeholder='Course Title'
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
 
-        <button className='btn-join create-course-submit' onClick={() => onCreate(email)}>
+        <input
+          type='text'
+          className='create-course-input'
+          placeholder='Short Description'
+          value={about}
+          onChange={(e) => setAbout(e.target.value)}
+        />
+
+        <button className='btn-join create-course-submit' onClick={handleCreate} disabled={loading}>
           <img src={panelIcon} alt="" className='btn-inline-icon' />
-          Create Course
+          {loading ? 'Creating...' : 'Create Course'}
         </button>
       </div>
     </div>

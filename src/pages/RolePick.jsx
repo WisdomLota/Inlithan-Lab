@@ -25,9 +25,26 @@ function RolePick() {
   const { setRole } = useAuth()
   const [selected, setSelected] = useState('teacher')
 
-  const handleDone = () => {
-    setRole(selected)
-    navigate('/dashboard')
+  const handleDone = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const res = await fetch('http://localhost:5000/auth/role', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ role: selected })
+      })
+      const data = await res.json()
+      if (data.success) {
+        localStorage.setItem('token', data.token)
+        setRole(selected)
+        navigate('/dashboard')
+      }
+    } catch (err) {
+      console.error('Failed to set role:', err)
+    }
   }
 
   return (
