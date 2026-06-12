@@ -3,6 +3,8 @@ import { useCourses } from '../context/useCourses'
 import { useActivities } from '../context/useActivities'
 import { useAuth } from '../context/useAuth'
 import './CourseDetail.css'
+import { useState, useRef } from 'react'
+import { uploadCoursePdf } from '../api/courses'
 
 function CourseDetail() {
   const { courseId } = useParams()
@@ -10,6 +12,28 @@ function CourseDetail() {
   const { activities } = useActivities()
   const { user } = useAuth()
   const navigate = useNavigate()
+
+  const [uploading, setUploading] = useState(false)
+  const [outdatedFlags, setOutdatedFlags] = useState([])
+  const fileInputRef = useRef(null)
+
+  const handlePdfUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const res = await uploadCoursePdf(course.id, file)
+      if (res.success) {
+        setOutdatedFlags(res.outdatedFlags || [])
+        window.location.reload()
+      }
+    } catch (err) {
+      console.error('Upload failed:', err)
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const isTeacher = user.role === 'teacher'
 
   const course = courses.find(c => c.id === courseId)
@@ -37,6 +61,33 @@ function CourseDetail() {
         <span className="breadcrumb-current">{course.title}</span>
       </div>
 
+      {isTeacher && (
+        <div style={{ padding: '0 24px 16px' }}>
+          <button
+            className="week-action-btn"
+            onClick={() => fileInputRef.current.click()}
+            disabled={uploading}
+          >
+            {uploading ? 'Generating week from PDF...' : '+ Upload Course Material (PDF)'}
+          </button>
+          <input
+            type="file"
+            accept=".pdf"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handlePdfUpload}
+          />
+          {outdatedFlags.length > 0 && (
+            <div style={{ marginTop: 12, padding: 12, border: '1px dashed #e05555', borderRadius: 6, color: '#e05555', fontSize: 13 }}>
+              <strong>AI flagged outdated content:</strong>
+              <ul>
+                {outdatedFlags.map((flag, i) => <li key={i}>{flag}</li>)}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="cd-section-header">
         <h2 className="cd-section-title">Course Activities</h2>
         <span className="see-more">See More ›</span>
@@ -50,7 +101,7 @@ function CourseDetail() {
           >
             <div className="activity-type">{activity.type}</div>
             <div className="activity-course-name">{activity.title}</div>
-            <div className="activity-meta">All {activity.total} &nbsp;&nbsp; {activity.questions} questions</div>
+            <div className="activity-meta">All {activity.total} &nbsp;&nbsp; {activity.questionCount ?? (Array.isArray(activity.questions) ? activity.questions.length : activity.questions)} questions</div>
             <div className="activity-grid-icon">⊞</div>
           </div>
         ))}
@@ -63,10 +114,10 @@ function CourseDetail() {
           const isPast = week.number < course.currentWeek
 
           return (
-            <div key={week.id} className="week-item">
+            <div key={week._id} className="week-item">
               <div
                 className={`week-header${isCurrent ? ' current' : isPast ? ' past' : ''}`}
-                onClick={() => navigate(`/courses/${courseId}/week/${week.id}`)}
+                onClick={() => navigate(`/courses/${courseId}/week/${week._id}`)}
               >
                 <span className="week-title-text">
                   <span className="week-num">Week {week.number}:</span>
@@ -81,7 +132,7 @@ function CourseDetail() {
                     <div className="week-actions">
                       <button
                         className="week-action-btn"
-                        onClick={() => navigate(`/courses/${courseId}/week/${week.id}`)}
+                        onClick={() => navigate(`/courses/${courseId}/week/${week._id}`)}
                       >
                         View
                       </button>
@@ -90,7 +141,7 @@ function CourseDetail() {
                   ) : (
                     <button
                       className="resume-btn"
-                      onClick={() => navigate(`/courses/${courseId}/week/${week.id}`)}
+                      onClick={() => navigate(`/courses/${courseId}/week/${week._id}`)}
                     >
                       Resume
                     </button>
