@@ -70,3 +70,8 @@ export const uploadCourseIcon = async (id, file) => {
   });
   return res.data;
 };
+
+export const updateWeek = async (courseId, weekId, updates) => {
+  const res = await axios.put(`${API_URL}/${courseId}/weeks/${weekId}`, updates, authHeader());
+  return res.data;
+};

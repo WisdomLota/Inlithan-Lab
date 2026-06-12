@@ -6,6 +6,7 @@ import './CourseDetail.css'
 import { useState, useRef } from 'react'
 import { uploadCoursePdf } from '../api/courses'
 import { uploadCourseIcon } from '../api/courses'
+import { updateWeek } from '../api/courses'
 
 function CourseDetail() {
   const { courseId } = useParams()
@@ -49,6 +50,29 @@ function CourseDetail() {
       console.error('Icon upload failed:', err)
     } finally {
       setUploadingIcon(false)
+    }
+  }
+
+  const [editingWeek, setEditingWeek] = useState(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [savingWeek, setSavingWeek] = useState(false)
+
+  function openEdit(week) {
+    setEditingWeek(week)
+    setEditTitle(week.title)
+    setEditDescription(week.description)
+  }
+
+  async function saveWeekEdit() {
+    setSavingWeek(true)
+    try {
+      await updateWeek(course.id, editingWeek._id, { title: editTitle, description: editDescription })
+      window.location.reload()
+    } catch (err) {
+      console.error('Failed to update week:', err)
+    } finally {
+      setSavingWeek(false)
     }
   }
 
@@ -170,7 +194,7 @@ function CourseDetail() {
                       >
                         View
                       </button>
-                      <button className="week-action-btn">Edit</button>
+                      <button className="week-action-btn" onClick={() => openEdit(week)}>Edit</button>
                     </div>
                   ) : (
                     <button
@@ -202,6 +226,35 @@ function CourseDetail() {
             </>
           )}
           {course.aboutClosing && <p className="about-text">{course.aboutClosing}</p>}
+        </div>
+      )}
+
+      {editingWeek && (
+        <div className="popup-overlay" onClick={() => setEditingWeek(null)}>
+          <div className="create-course-popup" onClick={e => e.stopPropagation()}>
+            <div className="create-course-popup-header">
+              <span>Edit Week</span>
+              <button className="new-student-popup-close" onClick={() => setEditingWeek(null)}>✕</button>
+            </div>
+            <input
+              type="text"
+              className="create-course-input"
+              placeholder="Week title"
+              value={editTitle}
+              onChange={e => setEditTitle(e.target.value)}
+            />
+            <textarea
+              className="create-course-input"
+              placeholder="Week description"
+              value={editDescription}
+              onChange={e => setEditDescription(e.target.value)}
+              rows={4}
+              style={{ resize: 'vertical' }}
+            />
+            <button className="btn-join create-course-submit" onClick={saveWeekEdit} disabled={savingWeek}>
+              {savingWeek ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
         </div>
       )}
     </div>
