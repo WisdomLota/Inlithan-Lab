@@ -5,6 +5,7 @@ import { useAuth } from '../context/useAuth'
 import './CourseDetail.css'
 import { useState, useRef } from 'react'
 import { uploadCoursePdf } from '../api/courses'
+import { uploadCourseIcon } from '../api/courses'
 
 function CourseDetail() {
   const { courseId } = useParams()
@@ -31,6 +32,23 @@ function CourseDetail() {
       console.error('Upload failed:', err)
     } finally {
       setUploading(false)
+    }
+  }
+
+  const [uploadingIcon, setUploadingIcon] = useState(false)
+  const iconInputRef = useRef(null)
+  
+  const handleIconUpload = async (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    setUploadingIcon(true)
+    try {
+      await uploadCourseIcon(course.id, file)
+      window.location.reload()
+    } catch (err) {
+      console.error('Icon upload failed:', err)
+    } finally {
+      setUploadingIcon(false)
     }
   }
 
@@ -76,6 +94,22 @@ function CourseDetail() {
             ref={fileInputRef}
             style={{ display: 'none' }}
             onChange={handlePdfUpload}
+          />
+
+          <button
+            className="week-action-btn"
+            style={{ marginLeft: 12 }}
+            onClick={() => iconInputRef.current.click()}
+            disabled={uploadingIcon}
+          >
+            {uploadingIcon ? 'Uploading icon...' : '+ Set Course Icon'}
+          </button>
+          <input
+            type="file"
+            accept="image/*"
+            ref={iconInputRef}
+            style={{ display: 'none' }}
+            onChange={handleIconUpload}
           />
           {outdatedFlags.length > 0 && (
             <div style={{ marginTop: 12, padding: 12, border: '1px dashed #e05555', borderRadius: 6, color: '#e05555', fontSize: 13 }}>

@@ -58,3 +58,15 @@ export const getAllStudents = async () => {
   const res = await axios.get(`${API_URL}/students/all`, authHeader());
   return res.data;
 };
+
+export const uploadCourseIcon = async (id, file) => {
+  const formData = new FormData();
+  formData.append("icon", file);
+  const res = await axios.post(`${API_URL}/${id}/icon`, formData, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return res.data;
+};
