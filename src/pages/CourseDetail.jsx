@@ -7,6 +7,7 @@ import { useState, useRef } from 'react'
 import { uploadCoursePdf } from '../api/courses'
 import { uploadCourseIcon } from '../api/courses'
 import { updateWeek } from '../api/courses'
+import { recheckWeek } from '../api/courses'
 
 function CourseDetail() {
   const { courseId } = useParams()
@@ -73,6 +74,21 @@ function CourseDetail() {
       console.error('Failed to update week:', err)
     } finally {
       setSavingWeek(false)
+    }
+  }
+
+  const [checkingWeek, setCheckingWeek] = useState(null)
+  const [weekFlags, setWeekFlags] = useState({})
+
+  async function handleRecheck(week) {
+    setCheckingWeek(week._id)
+    try {
+      const res = await recheckWeek(course.id, week._id)
+      setWeekFlags(prev => ({ ...prev, [week._id]: res.data }))
+    } catch (err) {
+      console.error('Recheck failed:', err)
+    } finally {
+      setCheckingWeek(null)
     }
   }
 
@@ -195,6 +211,9 @@ function CourseDetail() {
                         View
                       </button>
                       <button className="week-action-btn" onClick={() => openEdit(week)}>Edit</button>
+                      <button className="week-action-btn" onClick={() => handleRecheck(week)} disabled={checkingWeek === week._id}>
+                        {checkingWeek === week._id ? 'Checking...' : 'Check for Outdated Content'}
+                      </button>
                     </div>
                   ) : (
                     <button
@@ -203,6 +222,21 @@ function CourseDetail() {
                     >
                       Resume
                     </button>
+                  )}
+
+                  {weekFlags[week._id] && (
+                    <div style={{ marginTop: 12, padding: 12, border: '1px dashed', borderColor: weekFlags[week._id].isUpToDate ? '#00B764' : '#e05555', borderRadius: 6, color: weekFlags[week._id].isUpToDate ? '#00B764' : '#e05555', fontSize: 13 }}>
+                      {weekFlags[week._id].isUpToDate ? (
+                        <strong>✓ Content appears up to date.</strong>
+                      ) : (
+                        <>
+                          <strong>AI flagged outdated content:</strong>
+                          <ul>
+                            {(weekFlags[week._id].outdatedFlags || []).map((flag, i) => <li key={i}>{flag}</li>)}
+                          </ul>
+                        </>
+                      )}
+                    </div>
                   )}
                 </div>
               )}

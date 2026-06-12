@@ -75,3 +75,8 @@ export const updateWeek = async (courseId, weekId, updates) => {
   const res = await axios.put(`${API_URL}/${courseId}/weeks/${weekId}`, updates, authHeader());
   return res.data;
 };
+
+export const recheckWeek = async (courseId, weekId) => {
+  const res = await axios.post(`${API_URL}/${courseId}/weeks/${weekId}/recheck`, {}, authHeader());
+  return res.data;
+};
