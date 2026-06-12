@@ -31,8 +31,8 @@ function WeekDetail() {
   const [isFlipped, setIsFlipped] = useState(false)
   const [summaryView, setSummaryView] = useState('lesson')
 
-  const course = courses.find(c => c.id === parseInt(courseId))
-  const week = course?.weeks.find(w => w.id === parseInt(weekId))
+  const course = courses.find(c => c.id === courseId)
+  const week = course?.weeks.find(w => w.id === weekId || w._id === weekId)
 
   if (!course || !week) return <div style={{ color: '#fff', padding: 24 }}>Week not found</div>
 

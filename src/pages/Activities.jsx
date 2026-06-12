@@ -56,7 +56,7 @@ function Activities (){
               title={activity.title}
               total={activity.total}
               questions={activity.questions}
-              onClick={isTeacher ? () => navigate(`/courses/${activity.courseId}/activity/${activity.id}`) : undefined}
+              onClick={isTeacher ? () => navigate(`/courses/${activity.courseId?._id || activity.courseId}/activity/${activity.id}`) : undefined}
               />
             ))}
           </div>

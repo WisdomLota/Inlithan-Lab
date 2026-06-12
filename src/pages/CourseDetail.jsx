@@ -12,11 +12,13 @@ function CourseDetail() {
   const navigate = useNavigate()
   const isTeacher = user.role === 'teacher'
 
-  const course = courses.find(c => c.id === parseInt(courseId))
+  const course = courses.find(c => c.id === courseId)
 
   if (!course) return <div style={{ color: '#fff', padding: 24 }}>Course not found</div>
 
-  const courseActivities = activities.filter(a => a.courseId === course.id)
+  const courseActivities = activities.filter(a => 
+    (a.courseId?._id || a.courseId) === course.id
+  )
 
   const sortedWeeks = [...course.weeks].sort((a, b) => {
     if (a.number === course.currentWeek) return -1

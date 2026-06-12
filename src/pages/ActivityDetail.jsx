@@ -13,8 +13,8 @@ function ActivityDetail() {
 
   if (user.role !== 'teacher') return <Navigate to="/dashboard" />
 
-  const course = courses.find(c => c.id === parseInt(courseId))
-  const activity = activities.find(a => a.id === parseInt(activityId))
+  const course = courses.find(c => c.id === courseId)
+  const activity = activities.find(a => a.id === activityId)
 
   if (!course || !activity) {
     return <div style={{ color: '#fff', padding: 24 }}>Activity not found</div>
