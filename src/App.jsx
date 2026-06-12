@@ -10,6 +10,7 @@ import Activities from "./pages/Activities"
 import AILabs from "./pages/AILabs"
 import Explore from "./pages/Explore"
 import Settings from "./pages/Settings"
+import AuthCallback from "./pages/AuthCallback"
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from "./components/Layout"
 
@@ -31,6 +32,7 @@ function App() {
         <Route path="/labs" element={<Layout showHeader={true} showFooter={true} headerTitle="AILabs" showUser={false}><AILabs /></Layout>} />
         <Route path="/explore" element={<Layout showHeader={true} showFooter={false} headerTitle="Explore" showUser={false}><Explore /></Layout>} />
         <Route path="/settings" element={<Layout showHeader={true} showFooter={false} headerTitle="Settings" showUser={false}><Settings /></Layout>} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
   

@@ -9,13 +9,11 @@ function Login(){
     const navigate = useNavigate()
 
     const handleGoogle = () => {
-        console.log('Google login')
-        navigate('/role')
+      window.location.href = 'http://localhost:5000/auth/google'
     }
-
+    
     const handleGithub = () => {
-        console.log('Github login')
-        navigate('/role')
+      window.location.href = 'http://localhost:5000/auth/github'
     }
   
     return(
