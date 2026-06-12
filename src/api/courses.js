@@ -53,3 +53,8 @@ export const uploadCoursePdf = async (id, file) => {
   });
   return res.data;
 };
+
+export const getAllStudents = async () => {
+  const res = await axios.get(`${API_URL}/students/all`, authHeader());
+  return res.data;
+};
