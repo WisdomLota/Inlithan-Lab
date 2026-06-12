@@ -43,6 +43,11 @@ function Sidebar(){
                     Activities
                 </NavLink>
 
+                <NavLink to="/leaderboard" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+                    <img src={studentListimg} alt="leaderboard image" className='nav-icon'/>
+                    Leaderboard
+                </NavLink>
+
                 <NavLink to="/labs" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
                     <img src={labsimg} alt="lab image" className='nav-icon'/>
                     Labs
