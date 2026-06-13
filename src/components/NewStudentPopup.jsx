@@ -1,17 +1,47 @@
-import { useState } from 'react'
-
-const initialRequests = [
-  { id: 1, email: '20201818@std.neu.edu.tr', course: 'Economics for engineers' },
-  { id: 2, email: '20247224@std.neu.edu.tr', course: 'Mobile programming' },
-  { id: 3, email: '20219080@std.neu.edu.tr', course: 'Engineering for engineers' },
-  { id: 4, email: '20232301@std.neu.edu.tr', course: 'Mobile programming' },
-]
+import { useState, useEffect } from 'react'
+import { getPendingRequests, acceptRequest, rejectRequest } from '../api/courses'
 
 function NewStudentPopup({ onClose }) {
-  const [requests, setRequests] = useState(initialRequests)
+  const [requests, setRequests] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const accept = (id) => setRequests(requests.filter((r) => r.id !== id))
-  const acceptAll = () => setRequests([])
+  async function load() {
+    try {
+      const res = await getPendingRequests()
+      setRequests(res.data || [])
+    } catch (err) {
+      console.error('Failed to load requests:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { load() }, [])
+
+  async function accept(req) {
+    try {
+      await acceptRequest(req.courseId, req.studentId)
+      setRequests(prev => prev.filter(r => r.id !== req.id))
+    } catch (err) {
+      console.error('Accept failed:', err)
+    }
+  }
+
+  async function reject(req) {
+    try {
+      await rejectRequest(req.courseId, req.studentId)
+      setRequests(prev => prev.filter(r => r.id !== req.id))
+    } catch (err) {
+      console.error('Reject failed:', err)
+    }
+  }
+
+  async function acceptAll() {
+    for (const req of requests) {
+      await acceptRequest(req.courseId, req.studentId)
+    }
+    setRequests([])
+  }
 
   return (
     <div className='new-student-popup'>
@@ -22,20 +52,23 @@ function NewStudentPopup({ onClose }) {
 
       <div className='new-student-popup-toolbar'>
         <span className='new-student-count'>Students ({requests.length})</span>
-        <button className='accept-link' onClick={acceptAll}>Accept All</button>
+        {requests.length > 0 && <button className='accept-link' onClick={acceptAll}>Accept All</button>}
       </div>
 
-      {requests.length === 0 ? (
+      {loading ? (
+        <p className='new-student-empty'>Loading...</p>
+      ) : requests.length === 0 ? (
         <p className='new-student-empty'>No new student requests.</p>
       ) : (
         requests.map((request) => (
           <div className='new-student-row' key={request.id}>
             <span className='new-student-avatar' />
             <div className='new-student-info'>
-              <span className='new-student-email'>{request.email}</span>
-              <span className='new-student-course'>{request.course}</span>
+              <span className='new-student-email'>{request.studentName || request.studentEmail}</span>
+              <span className='new-student-course'>{request.courseTitle}</span>
             </div>
-            <button className='accept-link' onClick={() => accept(request.id)}>Accept</button>
+            <button className='accept-link' onClick={() => accept(request)}>Accept</button>
+            <button className='accept-link' style={{ color: '#e05555' }} onClick={() => reject(request)}>Reject</button>
           </div>
         ))
       )}

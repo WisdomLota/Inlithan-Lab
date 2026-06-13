@@ -8,6 +8,7 @@ import { uploadCoursePdf } from '../api/courses'
 import { uploadCourseIcon } from '../api/courses'
 import { updateWeek } from '../api/courses'
 import { recheckWeek } from '../api/courses'
+import { searchStudents, addStudentToCourse } from '../api/courses'
 
 function CourseDetail() {
   const { courseId } = useParams()
@@ -94,6 +95,34 @@ function CourseDetail() {
     }
   }
 
+  const [showAddStudent, setShowAddStudent] = useState(false)
+  const [studentQuery, setStudentQuery] = useState('')
+  const [studentResults, setStudentResults] = useState([])
+  const [searching, setSearching] = useState(false)
+  
+  async function handleStudentSearch(q) {
+    setStudentQuery(q)
+    if (!q.trim()) { setStudentResults([]); return }
+    setSearching(true)
+    try {
+      const res = await searchStudents(q)
+      setStudentResults(res.data || [])
+    } catch (err) {
+      console.error('Search failed:', err)
+    } finally {
+      setSearching(false)
+    }
+  }
+  
+  async function handleAddStudent(studentId) {
+    try {
+      await addStudentToCourse(course.id, studentId)
+      setStudentResults(prev => prev.filter(s => s._id !== studentId))
+    } catch (err) {
+      console.error('Add student failed:', err)
+    }
+  }
+
   const isTeacher = user.role === 'teacher'
 
   const course = courses.find(c => c.id === courseId)
@@ -153,6 +182,13 @@ function CourseDetail() {
             style={{ display: 'none' }}
             onChange={handleIconUpload}
           />
+          <button
+            className="week-action-btn"
+            style={{ marginLeft: 12 }}
+            onClick={() => setShowAddStudent(true)}
+          >
+            + Add Student
+          </button>
           {outdatedFlags.length > 0 && (
             <div style={{ marginTop: 12, padding: 12, border: '1px dashed #e05555', borderRadius: 6, color: '#e05555', fontSize: 13 }}>
               <strong>AI flagged outdated content:</strong>
@@ -294,6 +330,35 @@ function CourseDetail() {
             <button className="btn-join create-course-submit" onClick={saveWeekEdit} disabled={savingWeek}>
               {savingWeek ? 'Saving...' : 'Save Changes'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {showAddStudent && (
+        <div className="popup-overlay" onClick={() => setShowAddStudent(false)}>
+          <div className="create-course-popup" onClick={e => e.stopPropagation()}>
+            <div className="create-course-popup-header">
+              <span>Add Student</span>
+              <button className="new-student-popup-close" onClick={() => setShowAddStudent(false)}>✕</button>
+            </div>
+            <input
+              type="text"
+              className="create-course-input"
+              placeholder="Search by name or email"
+              value={studentQuery}
+              onChange={e => handleStudentSearch(e.target.value)}
+            />
+            {searching && <p className="settings-hint">Searching...</p>}
+            {studentResults.map(s => (
+              <div key={s._id} className="new-student-row">
+                <span className="new-student-avatar" />
+                <div className="new-student-info">
+                  <span className="new-student-email">{s.name}</span>
+                  <span className="new-student-course">{s.email}</span>
+                </div>
+                <button className="accept-link" onClick={() => handleAddStudent(s._id)}>Add</button>
+              </div>
+            ))}
           </div>
         </div>
       )}

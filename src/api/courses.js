@@ -80,3 +80,28 @@ export const recheckWeek = async (courseId, weekId) => {
   const res = await axios.post(`${API_URL}/${courseId}/weeks/${weekId}/recheck`, {}, authHeader());
   return res.data;
 };
+
+export const searchStudents = async (query) => {
+  const res = await axios.get(`${API_URL}/students/search?q=${encodeURIComponent(query)}`, authHeader());
+  return res.data;
+};
+
+export const addStudentToCourse = async (courseId, studentId) => {
+  const res = await axios.post(`${API_URL}/${courseId}/students/${studentId}`, {}, authHeader());
+  return res.data;
+};
+
+export const getPendingRequests = async () => {
+  const res = await axios.get(`${API_URL}/requests/pending`, authHeader());
+  return res.data;
+};
+
+export const acceptRequest = async (courseId, studentId) => {
+  const res = await axios.post(`${API_URL}/${courseId}/requests/${studentId}/accept`, {}, authHeader());
+  return res.data;
+};
+
+export const rejectRequest = async (courseId, studentId) => {
+  const res = await axios.post(`${API_URL}/${courseId}/requests/${studentId}/reject`, {}, authHeader());
+  return res.data;
+};
